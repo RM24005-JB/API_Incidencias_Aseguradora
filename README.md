@@ -8,4 +8,5 @@ El uso de Git y GitHub garantiza una trazabilidad completa del desarrollo, evide
 ## Integrantes
 - Juan Antonio Artiga Jovel - AJ23001
 - Jacqueline Beatriz Renderos Martínez - RM24005
+- Rolando Duran Colocho - DC23003
 - Armando Enrique Garcia Mendez - GM21015
