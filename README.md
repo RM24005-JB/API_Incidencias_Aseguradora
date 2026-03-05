@@ -1,4 +1,4 @@
-# API_Incidencias_Aseguradora
+# API\_Incidencias\_Aseguradora
 
 Descripción del proyecto
 
@@ -6,7 +6,9 @@ Este proyecto consiste en una API diseñada para centralizar el registro, seguim
 El uso de Git y GitHub garantiza una trazabilidad completa del desarrollo, evidenciando la participación de cada integrante del equipo y permitiendo la integración segura y controlada de nuevas funcionalidades.
 
 ## Integrantes
-- Juan Antonio Artiga Jovel - AJ23001
-- Jacqueline Beatriz Renderos Martínez - RM24005
-- Rolando Duran Colocho - DC23003
-- Armando Enrique Garcia Mendez - GM21015
+
+* Juan Antonio Artiga Jovel - AJ23001
+* Jacqueline Beatriz Renderos Martínez - RM24005
+* Rolando Duran Colocho - DC23003
+* Armando Enrique Garcia Mendez - GM21015
+* Oscar Aníbal Gomez Luna - GL10025
