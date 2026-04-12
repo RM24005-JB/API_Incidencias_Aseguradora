@@ -1,4 +1,4 @@
-package com.academc.incidencias.model;
+package com.academic.incidencias.model;
 
 import jakarta.persistence.*;
 
