@@ -4,6 +4,7 @@ import com.academic.incidencias.dto.IncidenciaDTO;
 import com.academic.incidencias.model.Incidencia;
 import com.academic.incidencias.repository.IncidenciaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,13 +36,13 @@ public class IncidenciaService {
     }
 
     // Buscar incidencia por ID
-    public Optional<IncidenciaDTO> obtenerIncidencia(Long id) {
+    public Optional<IncidenciaDTO> obtenerIncidencia(@NonNull Long id) {
         return incidenciaRepository.findById(id)
                 .map(this::convertirADTO);
     }
 
     // Actualizar incidencia
-    public Optional<IncidenciaDTO> actualizarIncidencia(Long id, IncidenciaDTO dto) {
+    public Optional<IncidenciaDTO> actualizarIncidencia(@NonNull Long id, IncidenciaDTO dto) {
         return incidenciaRepository.findById(id).map(incidencia -> {
             incidencia.setDescripcion(dto.getDescripcion());
             incidencia.setEstado(dto.getEstado());
@@ -51,7 +52,7 @@ public class IncidenciaService {
     }
 
     // Eliminar incidencia
-    public boolean eliminarIncidencia(Long id) {
+    public boolean eliminarIncidencia(@NonNull Long id) {
         if (incidenciaRepository.existsById(id)) {
             incidenciaRepository.deleteById(id);
             return true;
