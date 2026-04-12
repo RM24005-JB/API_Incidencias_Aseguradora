@@ -4,9 +4,9 @@ import com.academic.incidencias.dto.IncidenciaDTO;
 import com.academic.incidencias.service.IncidenciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +19,6 @@ public class IncidenciaController {
 
     private final IncidenciaService incidenciaService;
 
-    @Autowired
     public IncidenciaController(IncidenciaService incidenciaService) {
         this.incidenciaService = incidenciaService;
     }
@@ -32,7 +31,7 @@ public class IncidenciaController {
 
     @Operation(summary = "Obtener incidencia por ID", description = "Devuelve una incidencia específica según su ID")
     @GetMapping("/{id}")
-    public ResponseEntity<IncidenciaDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<IncidenciaDTO> getById(@PathVariable @NonNull Long id) {
         Optional<IncidenciaDTO> incidencia = incidenciaService.obtenerIncidencia(id);
         return incidencia.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -46,14 +45,14 @@ public class IncidenciaController {
 
     @Operation(summary = "Actualizar incidencia", description = "Modifica los datos de una incidencia existente por ID")
     @PutMapping("/{id}")
-    public ResponseEntity<IncidenciaDTO> update(@PathVariable Long id, @RequestBody IncidenciaDTO incidencia) {
+    public ResponseEntity<IncidenciaDTO> update(@PathVariable @NonNull Long id, @RequestBody IncidenciaDTO incidencia) {
         Optional<IncidenciaDTO> updated = incidenciaService.actualizarIncidencia(id, incidencia);
         return updated.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Eliminar incidencia", description = "Elimina una incidencia existente por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable @NonNull Long id) {
         if (incidenciaService.eliminarIncidencia(id)) {
             return ResponseEntity.noContent().build();
         }
