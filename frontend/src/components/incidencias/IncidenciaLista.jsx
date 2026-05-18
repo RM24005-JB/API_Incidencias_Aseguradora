@@ -34,6 +34,9 @@ const IncidenciaLista = ({ incidencias, setIncidencias, categorias }) => {
                 <h2 className="titulo-seccion">Incidencias Registradas</h2>
                 <button className="btn-primary" onClick={() => setMostrarFormulario(true)}>Nueva Incidencia</button>
             </div>
+            <h3 style={{ marginBottom: '10px' }}>
+              Total: {incidencias.length} incidencias
+              </h3>
 
             {mostrarFormulario && (
                 <IncidenciaFormulario
