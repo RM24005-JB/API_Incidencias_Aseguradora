@@ -1,0 +1,13 @@
+*.class
+*.log
+*.jar
+*.war
+target/
+node_modules/
+dist/
+.env
+.DS_Store
+.idea/
+.vscode/
+uploads/
+*.iml
