@@ -41,7 +41,7 @@ Sistema de gestión de incidencias de aseguradoras que permite a usuarios y admi
 - PostgreSQL en contenedor
 
 ## Diagrama Entidad-Relación
-
+```
 
 ┌─────────────┐       ┌──────────────┐       ┌─────────────┐
 │   USUARIO   │       │    POLIZA    │       │ ASEGURADORA │
@@ -110,7 +110,7 @@ Sistema de gestión de incidencias de aseguradoras que permite a usuarios y admi
             │   USUARIO   │
             └─────────────┘
 
-
+```
 **Relaciones:**
 - Usuario ↔ Poliza: 1:N (Un usuario tiene múltiples pólizas)
 - Aseguradora ↔ Poliza: 1:N (Una aseguradora tiene múltiples pólizas)
