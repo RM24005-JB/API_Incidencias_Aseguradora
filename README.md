@@ -46,53 +46,71 @@ Sistema de gestión de incidencias de aseguradoras que permite a usuarios y admi
 ┌─────────────┐       ┌──────────────┐       ┌─────────────┐
 │   USUARIO   │       │    POLIZA    │       │ ASEGURADORA │
 ├─────────────┤       ├──────────────┤       ├─────────────┤
-│ id (PK)     │◄──────│ id (PK)      │◄──────│ id (PK)     │
-│ email       │  1:N  │ usuario_id   │  N:1  │ nombre      │
-│ password    │       │ aseguradora_ │       │ nit         │
-│ nombre      │       │     _id      │       │ contacto_   │
-│ telefono    │       │ numero_poliza│       │    email    │
-│ direccion   │       │ tipo         │       │ logo_url    │
-│ role        │       │ fecha_inicio │       └─────────────┘
-│ enabled     │       │ fecha_fin    │
-│ created_at  │       │ coberturas   │
-│ updated_at  │       │ created_at   │
-└─────────────┘       │ updated_at   │
-                      └──────────────┘
-                              │
-                              │ 1:N
-                              ▼
-                      ┌──────────────┐
-                      │    RECLAMO   │
-                      ├──────────────┤
-                      │ id (PK)      │
-                      │ poliza_id    │
-                      │ fecha_       │
-                      │   siniestro  │
-                      │ descripcion  │
-                      │ monto_       │
-                      │   estimado   │
-                      │ estado       │
-                      │ fecha_       │
-                      │   creacion   │
-                      │ fecha_       │
-                      │   actualiz.  │
-                      └──────────────┘
-                              │
-                              │ 1:N
-                              ▼
-                      ┌──────────────┐       ┌──────────────┐
-                      │  DOCUMENTO   │       │  HISTORIAL   │
-                      ├──────────────┤       ├──────────────┤
-                      │ id (PK)      │       │ id (PK)      │
-                      │ reclamo_id   │       │ reclamo_id   │
-                      │ nombre_      │       │ estado_      │
-                      │   archivo    │       │   anterior   │
-                      │ tipo_        │       │ estado_      │
-                      │   archivo    │       │   nuevo      │
-                      │ ruta_        │       │ fecha_       │
-                      │   archivo    │       │   cambio     │
-                      │ created_at   │       │ usuario_id   │
-                      └──────────────┘       └──────────────┘
+│ id (PK)     │       │ id (PK)      │◄──────│ id (PK)     │
+│ email       │       │ aseguradora_ │  N:1  │ nombre      │
+│ password    │       │     _id      │       │ nit         │
+│ nombre      │       │ numero_poliza│       │ contacto_   │
+│ telefono    │       │ tipo         │       │    email    │
+│ direccion   │       │ fecha_inicio │       │ logo_url    │
+│ role        │       │ fecha_fin    │       └─────────────┘
+│ enabled     │       │ coberturas   │
+│ created_at  │       │ created_at   │
+│ updated_at  │       │ updated_at   │
+└─────────────┘       └──────────────┘
+       │                     │
+       │                     │ 1:N
+       │                     ▼
+       │             ┌──────────────┐
+       │             │    RECLAMO   │
+       │             ├──────────────┤
+       │             │ id (PK)      │
+       │             │ poliza_id    │
+       │             │ usuario_id   │◄──┐
+       │             │ fecha_       │   │
+       │             │   siniestro  │   │
+       │             │ descripcion  │   │
+       │             │ monto_       │   │
+       │             │   estimado   │   │
+       │             │ estado       │   │
+       │             │ fecha_       │   │
+       │             │   creacion   │   │
+       │             │ fecha_       │   │
+       │             │   actualiz.  │   │
+       │             └──────────────┘   │
+       │                     │           │
+       │                     │ 1:N       │ 1:N
+       │                     ▼           │
+       │             ┌──────────────┐   │
+       │             │  DOCUMENTO   │   │
+       │             ├──────────────┤   │
+       │             │ id (PK)      │   │
+       │             │ reclamo_id   │   │
+       │             │ nombre_      │   │
+       │             │   archivo    │   │
+       │             │ tipo_        │   │
+       │             │   archivo    │   │
+       │             │ ruta_        │   │
+       │             │   archivo    │   │
+       │             │ created_at   │   │
+       │             └──────────────┘   │
+       │                     │           │
+       │                     │ 1:N       │
+       │                     ▼           │
+       │             ┌──────────────┐   │
+       │             │  HISTORIAL   │   │
+       │             ├──────────────┤   │
+       │             │ id (PK)      │   │
+       │             │ reclamo_id   │   │
+       │             │ estado_      │   │
+       │             │   anterior   │   │
+       │             │ estado_      │   │
+       │             │   nuevo      │   │
+       │             │ fecha_       │   │
+       │             │   cambio     │   │
+       │             │ usuario_id   │   │
+       │             └──────────────┘   │
+       │                                 │
+       └─────────────────────────────────┘
 
 ┌─────────────┐
 │ REFRESH_    │
@@ -112,12 +130,17 @@ Sistema de gestión de incidencias de aseguradoras que permite a usuarios y admi
 
 ```
 **Relaciones:**
-- Usuario ↔ Poliza: 1:N (Un usuario tiene múltiples pólizas)
+- Usuario ↔ Reclamo: 1:N (Un usuario tiene múltiples reclamos)
 - Aseguradora ↔ Poliza: 1:N (Una aseguradora tiene múltiples pólizas)
 - Poliza ↔ Reclamo: 1:N (Una póliza tiene múltiples reclamos)
 - Reclamo ↔ Documento: 1:N (Un reclamo tiene múltiples documentos)
 - Reclamo ↔ Historial: 1:N (Un reclamo tiene múltiples cambios de estado)
 - Usuario ↔ RefreshToken: 1:N (Un usuario tiene múltiples refresh tokens)
+
+**Nota importante sobre el modelo de datos:**
+- Las pólizas son productos de aseguradoras, independientes de usuarios
+- Cualquier usuario puede hacer reclamos sobre cualquier póliza disponible
+- La relación Usuario-Póliza es a través de Reclamos, no directa
 
 ## Manual de Despliegue
 

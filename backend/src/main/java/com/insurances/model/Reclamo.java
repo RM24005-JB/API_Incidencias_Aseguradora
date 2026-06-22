@@ -15,6 +15,7 @@ import java.util.List;
 @Table(name = "reclamos",
        indexes = {
            @Index(name = "idx_reclamo_poliza", columnList = "poliza_id"),
+           @Index(name = "idx_reclamo_usuario", columnList = "usuario_id"),
            @Index(name = "idx_reclamo_estado", columnList = "estado"),
            @Index(name = "idx_reclamo_fecha", columnList = "fechaCreacion")
        })
@@ -25,10 +26,13 @@ public class Reclamo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // FIX: Añadir @JoinColumn explícito para coincidir con el índice y evitar inconsistencias
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poliza_id")
     private Poliza poliza;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     private LocalDateTime fechaSiniestro;
     private String descripcion;
@@ -39,7 +43,7 @@ public class Reclamo {
 
     private String numeroReferenciaExterno;
 
-    @CreatedDate
+    // FIX: Remove @CreatedDate to allow manual date setting in DataInitializer
     private LocalDateTime fechaCreacion;
 
     @LastModifiedDate

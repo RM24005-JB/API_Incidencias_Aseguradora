@@ -22,8 +22,29 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Manejo de 401: intentar refresh token
+    // Manejo de errores de red (sin respuesta del servidor) - verificar primero
+    if (!error.response) {
+      let message = 'Error de conexión. Verifique su conexión a internet.';
+      if (error.code === 'ECONNABORTED') {
+        message = 'Tiempo de espera agotado. Verifique su conexión a internet.';
+      } else if (error.code === 'ECONNREFUSED') {
+        message = 'No se puede conectar al servidor. Verifique su conexión a internet.';
+      } else if (error.message && error.message.includes('Network Error')) {
+        message = 'Error de red. Verifique su conexión a internet.';
+      }
+      toast.error(message);
+      return Promise.reject(error);
+    }
+
+    // Manejo de 401: intentar refresh token solo si no es login
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
+      // Si es el endpoint de login, no intentar refresh token, mostrar mensaje específico
+      if (originalRequest.url?.includes('/auth/login')) {
+        const message = error.response?.data?.message || 'Credenciales inválidas';
+        toast.error(message);
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {
@@ -62,16 +83,30 @@ api.interceptors.response.use(
       }
     }
 
-    // FIX: Manejar 403 Forbidden
+    // Manejo de 403 Forbidden
     if (error.response?.status === 403) {
       const message = error.response?.data?.message || 'No tiene permisos para esta acción';
       toast.error(message);
       return Promise.reject(error);
     }
 
-    // FIX: Manejar errores de red (sin respuesta del servidor)
-    if (!error.response) {
-      toast.error('Error de conexión. Verifique su conexión a internet.');
+    // Manejo de 400 Bad Request (validación)
+    if (error.response?.status === 400) {
+      const message = error.response?.data?.message || 'Datos inválidos. Verifique la información ingresada.';
+      toast.error(message);
+      return Promise.reject(error);
+    }
+
+    // Manejo de 404 Not Found
+    if (error.response?.status === 404) {
+      const message = error.response?.data?.message || 'Recurso no encontrado';
+      toast.error(message);
+      return Promise.reject(error);
+    }
+
+    // Manejo de 500 Internal Server Error
+    if (error.response?.status === 500) {
+      toast.error('Error del servidor. Intente nuevamente más tarde.');
       return Promise.reject(error);
     }
 

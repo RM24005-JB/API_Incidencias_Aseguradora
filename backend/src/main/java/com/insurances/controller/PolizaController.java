@@ -29,18 +29,17 @@ public class PolizaController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar pólizas del usuario (con paginación y filtro por aseguradora)")
-    public ResponseEntity<Page<PolizaDTO>> listarMisPolizas(@AuthenticationPrincipal UserDetails user,
+    @Operation(summary = "Listar todas las pólizas del sistema (con paginación y filtro por aseguradora)")
+    public ResponseEntity<Page<PolizaDTO>> listarTodasPolizas(@AuthenticationPrincipal UserDetails user,
                                                             @RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size,
                                                             @RequestParam(required = false) Long aseguradoraId) {
-        Long usuarioId = getUsuarioId(user);
         PageRequest pageable = PageRequest.of(page, size, Sort.by("fechaInicio").descending());
         Page<PolizaDTO> polizas;
         if (aseguradoraId != null) {
-            polizas = polizaService.listarPorUsuarioYAseguradora(usuarioId, aseguradoraId, pageable);
+            polizas = polizaService.listarPorAseguradora(aseguradoraId, pageable);
         } else {
-            polizas = polizaService.listarPorUsuario(usuarioId, pageable);
+            polizas = polizaService.listarTodos(pageable);
         }
         return ResponseEntity.ok(polizas);
     }
@@ -48,22 +47,25 @@ public class PolizaController {
     @PostMapping
     @Operation(summary = "Crear una nueva póliza")
     public ResponseEntity<PolizaDTO> crear(@Valid @RequestBody PolizaDTO dto, @AuthenticationPrincipal UserDetails user) {
-        Long usuarioId = getUsuarioId(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(polizaService.crear(dto, usuarioId));
+        // Ya no se necesita usuarioId para crear pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return ResponseEntity.status(HttpStatus.CREATED).body(polizaService.crearComoAdmin(dto));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar una póliza existente (solo propietario)")
     public ResponseEntity<PolizaDTO> actualizar(@PathVariable Long id, @Valid @RequestBody PolizaDTO dto, @AuthenticationPrincipal UserDetails user) {
-        Long usuarioId = getUsuarioId(user);
-        return ResponseEntity.ok(polizaService.actualizar(id, dto, usuarioId));
+        // Ya no se verifica usuarioId para actualizar pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return ResponseEntity.ok(polizaService.actualizarComoAdmin(id, dto));
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar una póliza (solo propietario)")
     public ResponseEntity<Void> eliminar(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
-        Long usuarioId = getUsuarioId(user);
-        polizaService.eliminar(id, usuarioId);
+        // Ya no se verifica usuarioId para eliminar pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        polizaService.eliminar(id, null);
         return ResponseEntity.noContent().build();
     }
 }

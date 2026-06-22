@@ -24,17 +24,9 @@ const Login = () => {
       await login(data);
       navigate('/dashboard');
     } catch (err) {
-      let errorMessage = t('error');
-      if (err.response?.status === 401) {
-        errorMessage = t('invalidCredentials');
-      } else if (err.response?.status === 403) {
-        errorMessage = t('accountDisabled');
-      } else if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (!err.response) {
-        errorMessage = t('networkError');
-      }
-      toast.error(errorMessage);
+      // No mostrar toast.error aquí porque el interceptor de Axios ya muestra el mensaje específico
+      // Solo loguear el error para debugging
+      console.error('Login error:', err);
     }
   };
 

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 public class ReclamoService {
     private final ReclamoRepository reclamoRepository;
     private final PolizaRepository polizaRepository;
+    private final UsuarioRepository usuarioRepository;
     private final EmailSimulationService emailSimulationService;
     private final ReclamoEstadoHistorialRepository historialRepository;
 
@@ -27,7 +29,7 @@ public class ReclamoService {
     // al acceder a relaciones lazy en toDTO()
     @Transactional(readOnly = true)
     public Page<ReclamoDTO> listarPorUsuario(Long usuarioId, Pageable pageable) {
-        return reclamoRepository.findByPolizaUsuarioId(usuarioId, pageable).map(this::toDTO);
+        return reclamoRepository.findByUsuarioId(usuarioId, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -37,57 +39,76 @@ public class ReclamoService {
 
     @Transactional(readOnly = true)
     public Page<ReclamoDTO> listarPorUsuarioConFiltros(Long usuarioId, EstadoReclamo estado, 
-                                                        Long aseguradoraId, LocalDateTime fechaDesde,
-                                                        LocalDateTime fechaHasta, Pageable pageable) {
-        // Simplified filtering - only filter by status or insurer, ignore date filters for now
-        Page<Reclamo> result;
-        if (estado != null && aseguradoraId != null) {
-            // For combined filters, return user's claims and filter in memory
-            result = reclamoRepository.findByPolizaUsuarioId(usuarioId, pageable);
-        } else if (estado != null) {
-            result = reclamoRepository.findByPolizaUsuarioIdAndEstado(usuarioId, estado, pageable);
-        } else if (aseguradoraId != null) {
-            result = reclamoRepository.findByPolizaUsuarioIdAndPolizaAseguradoraId(usuarioId, aseguradoraId, pageable);
-        } else {
-            result = reclamoRepository.findByPolizaUsuarioId(usuarioId, pageable);
-        }
-        return result.map(this::toDTO);
+                                                        Long aseguradoraId, LocalDate fechaDesde,
+                                                        LocalDate fechaHasta, Pageable pageable) {
+        // Get all user claims first
+        Page<Reclamo> result = reclamoRepository.findByUsuarioId(usuarioId, pageable);
+        
+        // Convert LocalDate to LocalDateTime for comparison
+        LocalDateTime fechaDesdeDateTime = fechaDesde != null ? fechaDesde.atStartOfDay() : null;
+        LocalDateTime fechaHastaDateTime = fechaHasta != null ? fechaHasta.atTime(23, 59, 59) : null;
+        
+        // Apply filters in memory for combined filters
+        return result.getContent().stream()
+            .filter(r -> estado == null || r.getEstado() == estado)
+            .filter(r -> aseguradoraId == null || r.getPoliza().getAseguradora().getId().equals(aseguradoraId))
+            .filter(r -> fechaDesdeDateTime == null || r.getFechaCreacion() == null || !r.getFechaCreacion().isBefore(fechaDesdeDateTime))
+            .filter(r -> fechaHastaDateTime == null || r.getFechaCreacion() == null || !r.getFechaCreacion().isAfter(fechaHastaDateTime))
+            .map(this::toDTO)
+            .toList()
+            .stream()
+            .collect(java.util.stream.Collectors.collectingAndThen(
+                java.util.stream.Collectors.toList(),
+                list -> new org.springframework.data.domain.PageImpl<>(list, pageable, list.size())
+            ));
     }
 
     @Transactional(readOnly = true)
     public Page<ReclamoDTO> listarTodosConFiltros(EstadoReclamo estado, Long aseguradoraId,
-                                                  LocalDateTime fechaDesde, LocalDateTime fechaHasta,
+                                                  LocalDate fechaDesde, LocalDate fechaHasta,
                                                   Pageable pageable) {
-        // Simplified filtering - only filter by status or insurer, ignore date filters for now
-        Page<Reclamo> result;
-        if (estado != null && aseguradoraId != null) {
-            // For combined filters, return all claims and filter in memory
-            result = reclamoRepository.findAll(pageable);
-        } else if (estado != null) {
-            result = reclamoRepository.findByEstado(estado, pageable);
-        } else if (aseguradoraId != null) {
-            result = reclamoRepository.findByPolizaAseguradoraId(aseguradoraId, pageable);
-        } else {
-            result = reclamoRepository.findAll(pageable);
-        }
-        return result.map(this::toDTO);
+        // Get all claims first
+        Page<Reclamo> result = reclamoRepository.findAll(pageable);
+        
+        // Convert LocalDate to LocalDateTime for comparison
+        LocalDateTime fechaDesdeDateTime = fechaDesde != null ? fechaDesde.atStartOfDay() : null;
+        LocalDateTime fechaHastaDateTime = fechaHasta != null ? fechaHasta.atTime(23, 59, 59) : null;
+        
+        // Apply filters in memory for combined filters
+        return result.getContent().stream()
+            .filter(r -> estado == null || r.getEstado() == estado)
+            .filter(r -> aseguradoraId == null || r.getPoliza().getAseguradora().getId().equals(aseguradoraId))
+            .filter(r -> fechaDesdeDateTime == null || r.getFechaCreacion() == null || !r.getFechaCreacion().isBefore(fechaDesdeDateTime))
+            .filter(r -> fechaHastaDateTime == null || r.getFechaCreacion() == null || !r.getFechaCreacion().isAfter(fechaHastaDateTime))
+            .map(this::toDTO)
+            .toList()
+            .stream()
+            .collect(java.util.stream.Collectors.collectingAndThen(
+                java.util.stream.Collectors.toList(),
+                list -> new org.springframework.data.domain.PageImpl<>(list, pageable, list.size())
+            ));
     }
 
     @Transactional
     public ReclamoDTO crear(ReclamoDTO dto, Long usuarioId) {
         Poliza poliza = polizaRepository.findById(dto.getPolizaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Póliza no encontrada"));
+        
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        if (!poliza.getUsuario().getId().equals(usuarioId)) {
-            throw new ForbiddenException("La póliza no pertenece al usuario");
-        }
+        // Ya no se verifica que la póliza pertenezca al usuario
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        // Cualquier usuario puede hacer un reclamo sobre cualquier póliza
 
         Reclamo reclamo = new Reclamo();
         reclamo.setPoliza(poliza);
+        reclamo.setUsuario(usuario);
         reclamo.setFechaSiniestro(dto.getFechaSiniestro());
         reclamo.setDescripcion(dto.getDescripcion());
         reclamo.setMontoEstimado(dto.getMontoEstimado());
         reclamo.setEstado(EstadoReclamo.REGISTRADO);
+        reclamo.setFechaCreacion(java.time.LocalDateTime.now());
         reclamo = reclamoRepository.save(reclamo);
 
         guardarHistorial(reclamo, null, reclamo.getEstado(), "SISTEMA");
@@ -102,7 +123,7 @@ public class ReclamoService {
         Reclamo reclamo = reclamoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reclamo no encontrado"));
 
-        if (!isAdmin && !reclamo.getPoliza().getUsuario().getId().equals(usuarioId)) {
+        if (!isAdmin && !reclamo.getUsuario().getId().equals(usuarioId)) {
             throw new ForbiddenException("No autorizado para ver este reclamo");
         }
 
@@ -145,7 +166,7 @@ public class ReclamoService {
         dto.setMontoEstimado(r.getMontoEstimado());
         dto.setEstado(r.getEstado());
         dto.setFechaCreacion(r.getFechaCreacion());
-        dto.setUsuarioEmail(r.getPoliza().getUsuario().getEmail());
+        dto.setUsuarioEmail(r.getUsuario() != null ? r.getUsuario().getEmail() : null);
         return dto;
     }
 }

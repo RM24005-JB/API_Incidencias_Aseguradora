@@ -14,8 +14,8 @@ import java.util.Set;
 @Entity
 @Table(name = "polizas",
        indexes = {
-           @Index(name = "idx_usuario_id", columnList = "usuario_id"),
-           @Index(name = "idx_numero_poliza", columnList = "numeroPoliza")
+           @Index(name = "idx_numero_poliza", columnList = "numeroPoliza"),
+           @Index(name = "idx_aseguradora_id", columnList = "aseguradora_id")
        })
 @Data
 @EntityListeners(AuditingEntityListener.class)
@@ -23,10 +23,6 @@ public class Poliza {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aseguradora_id")

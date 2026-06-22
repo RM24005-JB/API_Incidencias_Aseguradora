@@ -21,9 +21,7 @@ services:
 
   # Backend Spring Boot
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: api_incidencias_aseguradora-backend:latest
     container_name: insurances-backend
     ports:
       - "8080:8080"

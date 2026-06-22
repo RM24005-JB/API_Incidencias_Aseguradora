@@ -18,7 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/reclamos")
@@ -39,8 +39,8 @@ public class ReclamoController {
                                                               @RequestParam(defaultValue = "10") int size,
                                                               @RequestParam(required = false) EstadoReclamo estado,
                                                               @RequestParam(required = false) Long aseguradoraId,
-                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaDesde,
-                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaHasta) {
+                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
+                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta) {
         Long usuarioId = getUsuarioId(user);
         PageRequest pageable = PageRequest.of(page, size, Sort.by("fechaCreacion").descending());
 

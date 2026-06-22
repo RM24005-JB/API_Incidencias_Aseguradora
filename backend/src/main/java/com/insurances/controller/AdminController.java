@@ -24,7 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -43,8 +43,8 @@ public class AdminController {
                                                                 @RequestParam(defaultValue = "10") int size,
                                                                 @RequestParam(required = false) EstadoReclamo estado,
                                                                 @RequestParam(required = false) Long aseguradoraId,
-                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaDesde,
-                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaHasta) {
+                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
+                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaHasta) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by("fechaCreacion").descending());
         return ResponseEntity.ok(reclamoService.listarTodosConFiltros(estado, aseguradoraId, fechaDesde, fechaHasta, pageable));
     }
@@ -62,6 +62,12 @@ public class AdminController {
             polizas = polizaService.listarTodos(pageable);
         }
         return ResponseEntity.ok(polizas);
+    }
+
+    @PostMapping("/polizas")
+    @Operation(summary = "Crear una póliza para un usuario específico (admin)")
+    public ResponseEntity<PolizaDTO> crearPoliza(@Valid @RequestBody PolizaDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(polizaService.crearComoAdmin(dto));
     }
 
     @GetMapping("/polizas/{id}")
@@ -101,6 +107,13 @@ public class AdminController {
     @Operation(summary = "Activar/desactivar un usuario")
     public ResponseEntity<Void> toggleEnable(@PathVariable Long id) {
         adminService.toggleEnable(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/usuarios/{id}")
+    @Operation(summary = "Eliminar un usuario")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        adminService.eliminarUsuario(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -62,6 +62,14 @@ public class AuthService {
     }
 
     private JwtResponse authenticateAndGenerateTokens(String email, String password) {
+        // Verificar si el usuario existe y está habilitado antes de autenticar
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("El usuario no existe"));
+
+        if (!usuario.isEnabled()) {
+            throw new UnauthorizedException("El usuario está deshabilitado");
+        }
+
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(

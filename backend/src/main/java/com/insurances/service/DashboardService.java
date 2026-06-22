@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,8 +69,10 @@ public class DashboardService {
                     .orElse(null);
 
             if (usuarioId != null) {
-                long userPolicies = polizaRepository.countByUsuarioId(usuarioId);
-                stats.setTotalPolicies(userPolicies);
+                // Las pólizas son productos de aseguradoras, independientes de usuarios
+                // Mostramos todas las pólizas del sistema
+                long totalPolizas = polizaRepository.count();
+                stats.setTotalPolicies(totalPolizas);
 
                 Map<EstadoReclamo, Long> userPorEstado = new HashMap<>();
                 for (Object[] result : reclamoRepository.countByEstadoAndUsuarioId(usuarioId)) {
@@ -95,6 +98,7 @@ public class DashboardService {
                 List<Reclamo> userReclamos = reclamoRepository.findByPolizaUsuarioIdList(usuarioId);
 
                 List<DashboardStatsDTO.RecentClaim> recentUser = userReclamos.stream()
+                        .filter(r -> r.getFechaCreacion() != null)
                         .sorted((a, b) -> b.getFechaCreacion().compareTo(a.getFechaCreacion()))
                         .limit(5)
                         .map(r -> new DashboardStatsDTO.RecentClaim(
@@ -130,9 +134,14 @@ public class DashboardService {
         // Agrupar por número de mes (1-12) para evitar problemas de localización
         Map<Integer, Long> byMonthNumber = new HashMap<>();
         
+        log.info("Procesando {} reclamos para agrupar por mes", reclamos.size());
+        
         for (Reclamo reclamo : reclamos) {
             if (reclamo.getFechaCreacion() != null) {
                 int month = reclamo.getFechaCreacion().getMonthValue();
+                int year = reclamo.getFechaCreacion().getYear();
+                log.info("Reclamo ID: {}, Fecha: {}, Mes: {}, Año: {}", 
+                    reclamo.getId(), reclamo.getFechaCreacion(), month, year);
                 byMonthNumber.put(month, byMonthNumber.getOrDefault(month, 0L) + 1);
             }
         }
@@ -144,6 +153,10 @@ public class DashboardService {
             long count = byMonthNumber.getOrDefault(i, 0L);
             result.add(new DashboardStatsDTO.MonthlyClaim(monthsDisplay[i - 1], count));
         }
+        
+        // Log para debugging
+        log.info("Reclamos por mes: {}", result);
+        
         return result;
     }
 

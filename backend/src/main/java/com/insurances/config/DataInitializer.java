@@ -98,7 +98,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza1.setFechaInicio(LocalDate.of(2024, 1, 1));
                 poliza1.setFechaFin(LocalDate.of(2024, 12, 31));
                 poliza1.setCoberturas("Robo, Responsabilidad Civil, Gastos Médicos");
-                poliza1.setUsuario(cliente);
                 poliza1.setAseguradora(suiza);
                 polizaRepository.save(poliza1);
                 
@@ -108,7 +107,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza2.setFechaInicio(LocalDate.of(2024, 3, 1));
                 poliza2.setFechaFin(LocalDate.of(2025, 2, 28));
                 poliza2.setCoberturas("Gastos Médicos, Hospitalización");
-                poliza2.setUsuario(cliente);
                 poliza2.setAseguradora(suiza);
                 polizaRepository.save(poliza2);
                 
@@ -118,7 +116,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza3.setFechaInicio(LocalDate.of(2024, 5, 1));
                 poliza3.setFechaFin(LocalDate.of(2025, 4, 30));
                 poliza3.setCoberturas("Incendio, Robo, Daños por agua");
-                poliza3.setUsuario(cliente);
                 poliza3.setAseguradora(suiza);
                 polizaRepository.save(poliza3);
             }
@@ -130,7 +127,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza4.setFechaInicio(LocalDate.of(2024, 6, 1));
                 poliza4.setFechaFin(LocalDate.of(2025, 5, 31));
                 poliza4.setCoberturas("Colisión, Responsabilidad Civil");
-                poliza4.setUsuario(cliente);
                 poliza4.setAseguradora(roble);
                 polizaRepository.save(poliza4);
                 
@@ -140,7 +136,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza5.setFechaInicio(LocalDate.of(2024, 2, 1));
                 poliza5.setFechaFin(LocalDate.of(2034, 1, 31));
                 poliza5.setCoberturas("Muerte accidental, Invalidez");
-                poliza5.setUsuario(cliente);
                 poliza5.setAseguradora(roble);
                 polizaRepository.save(poliza5);
             }
@@ -152,7 +147,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza6.setFechaInicio(LocalDate.of(2024, 7, 1));
                 poliza6.setFechaFin(LocalDate.of(2025, 6, 30));
                 poliza6.setCoberturas("Todo riesgo, Asistencia en carretera");
-                poliza6.setUsuario(cliente);
                 poliza6.setAseguradora(atlantida);
                 polizaRepository.save(poliza6);
             }
@@ -164,7 +158,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza7.setFechaInicio(LocalDate.of(2024, 4, 1));
                 poliza7.setFechaFin(LocalDate.of(2025, 3, 31));
                 poliza7.setCoberturas("Gastos Médicos, Medicamentos, Consultas");
-                poliza7.setUsuario(cliente);
                 poliza7.setAseguradora(centro);
                 polizaRepository.save(poliza7);
             }
@@ -176,7 +169,6 @@ public class DataInitializer implements CommandLineRunner {
                 poliza8.setFechaInicio(LocalDate.of(2024, 8, 1));
                 poliza8.setFechaFin(LocalDate.of(2025, 7, 31));
                 poliza8.setCoberturas("Responsabilidad Civil, Daños a terceros");
-                poliza8.setUsuario(cliente);
                 poliza8.setAseguradora(sisa);
                 polizaRepository.save(poliza8);
             }
@@ -186,6 +178,9 @@ public class DataInitializer implements CommandLineRunner {
         
         // Crear reclamos de ejemplo con contexto de El Salvador
         if (cliente != null && reclamoRepository.count() < 15) {
+            // Verificar si ya existen reclamos para este cliente antes de crearlos
+            List<Reclamo> existingClaimsForCliente = reclamoRepository.findByPolizaUsuarioIdList(cliente.getId());
+            if (existingClaimsForCliente.isEmpty()) {
             List<Poliza> poliza1List = polizaRepository.findByNumeroPoliza("AS-2024-001");
             List<Poliza> poliza2List = polizaRepository.findByNumeroPoliza("ER-2024-001");
             List<Poliza> poliza3List = polizaRepository.findByNumeroPoliza("AS-2024-002");
@@ -207,6 +202,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza1 != null) {
                 Reclamo reclamo1 = new Reclamo();
                 reclamo1.setPoliza(poliza1);
+                reclamo1.setUsuario(cliente);
                 reclamo1.setFechaCreacion(LocalDateTime.of(2024, 6, 15, 10, 30));
                 reclamo1.setFechaSiniestro(LocalDateTime.of(2024, 6, 14, 15, 45));
                 reclamo1.setDescripcion("Colisión en boulevard de los Héroes, San Salvador. Daño en paragolpes delantero.");
@@ -216,6 +212,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo2 = new Reclamo();
                 reclamo2.setPoliza(poliza1);
+                reclamo2.setUsuario(cliente);
                 reclamo2.setFechaCreacion(LocalDateTime.of(2024, 8, 20, 14, 15));
                 reclamo2.setFechaSiniestro(LocalDateTime.of(2024, 8, 19, 8, 30));
                 reclamo2.setDescripcion("Robo de espejos laterales en estacionamiento de Metrocentro, Santa Tecla.");
@@ -227,6 +224,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza2 != null) {
                 Reclamo reclamo3 = new Reclamo();
                 reclamo3.setPoliza(poliza2);
+                reclamo3.setUsuario(cliente);
                 reclamo3.setFechaCreacion(LocalDateTime.of(2024, 9, 5, 9, 15));
                 reclamo3.setFechaSiniestro(LocalDateTime.of(2024, 9, 4, 16, 20));
                 reclamo3.setDescripcion("Intento de robo en estacionamiento de Multiplaza, San Salvador. Daño en cerradura.");
@@ -236,6 +234,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo4 = new Reclamo();
                 reclamo4.setPoliza(poliza2);
+                reclamo4.setUsuario(cliente);
                 reclamo4.setFechaCreacion(LocalDateTime.of(2024, 10, 12, 16, 30));
                 reclamo4.setFechaSiniestro(LocalDateTime.of(2024, 10, 11, 9, 45));
                 reclamo4.setDescripcion("Accidente en carretera a La Libertad. Choque trasero en semáforo.");
@@ -247,6 +246,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza3 != null) {
                 Reclamo reclamo5 = new Reclamo();
                 reclamo5.setPoliza(poliza3);
+                reclamo5.setUsuario(cliente);
                 reclamo5.setFechaCreacion(LocalDateTime.of(2024, 7, 8, 11, 20));
                 reclamo5.setFechaSiniestro(LocalDateTime.of(2024, 7, 7, 8, 15));
                 reclamo5.setDescripcion("Consulta de emergencia en Hospital de la Mujer, San Salvador. Apendicitis.");
@@ -256,6 +256,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo6 = new Reclamo();
                 reclamo6.setPoliza(poliza3);
+                reclamo6.setUsuario(cliente);
                 reclamo6.setFechaCreacion(LocalDateTime.of(2024, 11, 3, 8, 45));
                 reclamo6.setFechaSiniestro(LocalDateTime.of(2024, 11, 2, 14, 30));
                 reclamo6.setDescripcion("Procedimiento quirúrgico en Hospital Diagnóstico, San Salvador. Cirugía ambulatoria.");
@@ -267,6 +268,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza4 != null) {
                 Reclamo reclamo7 = new Reclamo();
                 reclamo7.setPoliza(poliza4);
+                reclamo7.setUsuario(cliente);
                 reclamo7.setFechaCreacion(LocalDateTime.of(2024, 8, 25, 13, 10));
                 reclamo7.setFechaSiniestro(LocalDateTime.of(2024, 8, 24, 17, 45));
                 reclamo7.setDescripcion("Volcadura en carretera Panamericana, cerca de San Miguel. Daños severos.");
@@ -278,6 +280,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza5 != null) {
                 Reclamo reclamo8 = new Reclamo();
                 reclamo8.setPoliza(poliza5);
+                reclamo8.setUsuario(cliente);
                 reclamo8.setFechaCreacion(LocalDateTime.of(2024, 9, 18, 10, 0));
                 reclamo8.setFechaSiniestro(LocalDateTime.of(2024, 9, 17, 11, 30));
                 reclamo8.setDescripcion("Hospitalización por dengue en Hospital Nacional Rosales, San Salvador.");
@@ -289,6 +292,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza6 != null) {
                 Reclamo reclamo9 = new Reclamo();
                 reclamo9.setPoliza(poliza6);
+                reclamo9.setUsuario(cliente);
                 reclamo9.setFechaCreacion(LocalDateTime.of(2024, 10, 5, 15, 30));
                 reclamo9.setFechaSiniestro(LocalDateTime.of(2024, 10, 4, 18, 15));
                 reclamo9.setDescripcion("Choque en intersección de Alameda Roosevelt y 25 Avenida Norte, San Salvador.");
@@ -298,6 +302,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo10 = new Reclamo();
                 reclamo10.setPoliza(poliza6);
+                reclamo10.setUsuario(cliente);
                 reclamo10.setFechaCreacion(LocalDateTime.of(2024, 12, 1, 9, 45));
                 reclamo10.setFechaSiniestro(LocalDateTime.of(2024, 11, 30, 16, 0));
                 reclamo10.setDescripcion("Daño por granizo en zona de Santa Ana. Parabrisas y techo afectados.");
@@ -309,6 +314,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza7 != null) {
                 Reclamo reclamo11 = new Reclamo();
                 reclamo11.setPoliza(poliza7);
+                reclamo11.setUsuario(cliente);
                 reclamo11.setFechaCreacion(LocalDateTime.of(2024, 11, 15, 14, 20));
                 reclamo11.setFechaSiniestro(LocalDateTime.of(2024, 11, 14, 7, 30));
                 reclamo11.setDescripcion("Inundación en residencia en Colonia Escalón, San Salvador. Daños en sala.");
@@ -318,6 +324,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo12 = new Reclamo();
                 reclamo12.setPoliza(poliza7);
+                reclamo12.setUsuario(cliente);
                 reclamo12.setFechaCreacion(LocalDateTime.of(2024, 12, 10, 11, 0));
                 reclamo12.setFechaSiniestro(LocalDateTime.of(2024, 12, 9, 22, 15));
                 reclamo12.setDescripcion("Intento de robo en vivienda en Antiguo Cuscatlán. Puerta forzada.");
@@ -329,6 +336,7 @@ public class DataInitializer implements CommandLineRunner {
             if (poliza8 != null) {
                 Reclamo reclamo13 = new Reclamo();
                 reclamo13.setPoliza(poliza8);
+                reclamo13.setUsuario(cliente);
                 reclamo13.setFechaCreacion(LocalDateTime.of(2024, 12, 5, 16, 45));
                 reclamo13.setFechaSiniestro(LocalDateTime.of(2024, 12, 4, 10, 30));
                 reclamo13.setDescripcion("Accidente de tránsito en boulevard Constitución, San Salvador. Lesiones leves.");
@@ -338,6 +346,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamo14 = new Reclamo();
                 reclamo14.setPoliza(poliza8);
+                reclamo14.setUsuario(cliente);
                 reclamo14.setFechaCreacion(LocalDateTime.of(2024, 12, 20, 10, 15));
                 reclamo14.setFechaSiniestro(LocalDateTime.of(2024, 12, 19, 15, 0));
                 reclamo14.setDescripcion("Daño por caída de árbol en zona de San Salvador. Techo del vehículo afectado.");
@@ -347,11 +356,17 @@ public class DataInitializer implements CommandLineRunner {
             }
             
             log.info("Se crearon reclamos de ejemplo.");
+            }
         }
         
         // Crear pólizas y reclamos para Cliente A (enero, febrero, marzo)
         Usuario clienteA = usuarioRepository.findByEmail("clienteA@example.com").orElse(null);
         if (clienteA != null && polizaRepository.count() < 15) {
+            // Verificar si ya existe la póliza AS-2024-A01
+            boolean polizaAExists = polizaRepository.findByNumeroPoliza("AS-2024-A01").stream()
+                .anyMatch(p -> p.getNumeroPoliza().equals("AS-2024-A01"));
+            
+            if (!polizaAExists) {
             List<Aseguradora> suizaList = aseguradoraRepository.findByNombre("Aseguradora Suiza");
             Aseguradora suiza = suizaList.isEmpty() ? null : suizaList.get(0);
             
@@ -362,13 +377,13 @@ public class DataInitializer implements CommandLineRunner {
                 polizaA1.setFechaInicio(LocalDate.of(2024, 1, 1));
                 polizaA1.setFechaFin(LocalDate.of(2024, 12, 31));
                 polizaA1.setCoberturas("Robo, Responsabilidad Civil, Gastos Médicos");
-                polizaA1.setUsuario(clienteA);
                 polizaA1.setAseguradora(suiza);
                 polizaRepository.save(polizaA1);
                 
                 // Reclamos de Cliente A en enero, febrero, marzo
                 Reclamo reclamoA1 = new Reclamo();
                 reclamoA1.setPoliza(polizaA1);
+                reclamoA1.setUsuario(clienteA);
                 reclamoA1.setFechaCreacion(LocalDateTime.of(2024, 1, 15, 10, 30));
                 reclamoA1.setFechaSiniestro(LocalDateTime.of(2024, 1, 14, 15, 45));
                 reclamoA1.setDescripcion("Colisión en zona norte, San Salvador. Daño en paragolpes.");
@@ -378,6 +393,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoA2 = new Reclamo();
                 reclamoA2.setPoliza(polizaA1);
+                reclamoA2.setUsuario(clienteA);
                 reclamoA2.setFechaCreacion(LocalDateTime.of(2024, 2, 20, 14, 15));
                 reclamoA2.setFechaSiniestro(LocalDateTime.of(2024, 2, 19, 8, 30));
                 reclamoA2.setDescripcion("Robo de espejos laterales en Santa Tecla.");
@@ -387,6 +403,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoA3 = new Reclamo();
                 reclamoA3.setPoliza(polizaA1);
+                reclamoA3.setUsuario(clienteA);
                 reclamoA3.setFechaCreacion(LocalDateTime.of(2024, 3, 10, 9, 15));
                 reclamoA3.setFechaSiniestro(LocalDateTime.of(2024, 3, 9, 16, 20));
                 reclamoA3.setDescripcion("Choque en semáforo de San Salvador.");
@@ -397,6 +414,7 @@ public class DataInitializer implements CommandLineRunner {
                 // Additional claims for Cliente A in October and November
                 Reclamo reclamoA4 = new Reclamo();
                 reclamoA4.setPoliza(polizaA1);
+                reclamoA4.setUsuario(clienteA);
                 reclamoA4.setFechaCreacion(LocalDateTime.of(2024, 10, 5, 16, 45));
                 reclamoA4.setFechaSiniestro(LocalDateTime.of(2024, 10, 4, 10, 30));
                 reclamoA4.setDescripcion("Daño en parabrisas por piedra en carretera a Santa Ana.");
@@ -406,6 +424,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 Reclamo reclamoA5 = new Reclamo();
                 reclamoA5.setPoliza(polizaA1);
+                reclamoA5.setUsuario(clienteA);
                 reclamoA5.setFechaCreacion(LocalDateTime.of(2024, 11, 18, 11, 20));
                 reclamoA5.setFechaSiniestro(LocalDateTime.of(2024, 11, 17, 14, 15));
                 reclamoA5.setDescripcion("Colisión en estacionamiento de centro comercial.");
@@ -414,11 +433,17 @@ public class DataInitializer implements CommandLineRunner {
                 reclamoRepository.save(reclamoA5);
             }
             log.info("Se crearon pólizas y reclamos para Cliente A.");
+            }
         }
         
         // Crear pólizas y reclamos para Cliente B (abril, mayo, junio)
         Usuario clienteB = usuarioRepository.findByEmail("clienteB@example.com").orElse(null);
         if (clienteB != null && polizaRepository.count() < 20) {
+            // Verificar si ya existe la póliza ER-2024-B01
+            boolean polizaBExists = polizaRepository.findByNumeroPoliza("ER-2024-B01").stream()
+                .anyMatch(p -> p.getNumeroPoliza().equals("ER-2024-B01"));
+            
+            if (!polizaBExists) {
             List<Aseguradora> robleList = aseguradoraRepository.findByNombre("Seguros El Roble");
             Aseguradora roble = robleList.isEmpty() ? null : robleList.get(0);
             
@@ -429,13 +454,13 @@ public class DataInitializer implements CommandLineRunner {
                 polizaB1.setFechaInicio(LocalDate.of(2024, 1, 1));
                 polizaB1.setFechaFin(LocalDate.of(2024, 12, 31));
                 polizaB1.setCoberturas("Colisión, Responsabilidad Civil");
-                polizaB1.setUsuario(clienteB);
                 polizaB1.setAseguradora(roble);
                 polizaRepository.save(polizaB1);
                 
                 // Reclamos de Cliente B en abril, mayo, junio
                 Reclamo reclamoB1 = new Reclamo();
                 reclamoB1.setPoliza(polizaB1);
+                reclamoB1.setUsuario(clienteB);
                 reclamoB1.setFechaCreacion(LocalDateTime.of(2024, 4, 12, 11, 20));
                 reclamoB1.setFechaSiniestro(LocalDateTime.of(2024, 4, 11, 8, 15));
                 reclamoB1.setDescripcion("Accidente en carretera a La Libertad.");
@@ -445,6 +470,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoB2 = new Reclamo();
                 reclamoB2.setPoliza(polizaB1);
+                reclamoB2.setUsuario(clienteB);
                 reclamoB2.setFechaCreacion(LocalDateTime.of(2024, 5, 18, 8, 45));
                 reclamoB2.setFechaSiniestro(LocalDateTime.of(2024, 5, 17, 14, 30));
                 reclamoB2.setDescripcion("Daño por granizo en zona de Santa Ana.");
@@ -454,6 +480,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoB3 = new Reclamo();
                 reclamoB3.setPoliza(polizaB1);
+                reclamoB3.setUsuario(clienteB);
                 reclamoB3.setFechaCreacion(LocalDateTime.of(2024, 6, 22, 15, 30));
                 reclamoB3.setFechaSiniestro(LocalDateTime.of(2024, 6, 21, 9, 45));
                 reclamoB3.setDescripcion("Choque en intersección de San Salvador.");
@@ -464,6 +491,7 @@ public class DataInitializer implements CommandLineRunner {
                 // Additional claims for Cliente B in July and December
                 Reclamo reclamoB4 = new Reclamo();
                 reclamoB4.setPoliza(polizaB1);
+                reclamoB4.setUsuario(clienteB);
                 reclamoB4.setFechaCreacion(LocalDateTime.of(2024, 7, 15, 9, 30));
                 reclamoB4.setFechaSiniestro(LocalDateTime.of(2024, 7, 14, 16, 20));
                 reclamoB4.setDescripcion("Atropello en zona de Santa Tecla.");
@@ -473,6 +501,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 Reclamo reclamoB5 = new Reclamo();
                 reclamoB5.setPoliza(polizaB1);
+                reclamoB5.setUsuario(clienteB);
                 reclamoB5.setFechaCreacion(LocalDateTime.of(2024, 12, 20, 14, 0));
                 reclamoB5.setFechaSiniestro(LocalDateTime.of(2024, 12, 19, 11, 45));
                 reclamoB5.setDescripcion("Daño por lluvia torrencial en zona de San Salvador.");
@@ -481,11 +510,17 @@ public class DataInitializer implements CommandLineRunner {
                 reclamoRepository.save(reclamoB5);
             }
             log.info("Se crearon pólizas y reclamos para Cliente B.");
+            }
         }
         
         // Crear pólizas y reclamos para Cliente C (julio, agosto, septiembre)
         Usuario clienteC = usuarioRepository.findByEmail("clienteC@example.com").orElse(null);
         if (clienteC != null && polizaRepository.count() < 25) {
+            // Verificar si ya existe la póliza AT-2024-C01
+            boolean polizaCExists = polizaRepository.findByNumeroPoliza("AT-2024-C01").stream()
+                .anyMatch(p -> p.getNumeroPoliza().equals("AT-2024-C01"));
+            
+            if (!polizaCExists) {
             List<Aseguradora> atlantidaList = aseguradoraRepository.findByNombre("Seguros Atlántida");
             Aseguradora atlantida = atlantidaList.isEmpty() ? null : atlantidaList.get(0);
             
@@ -496,13 +531,13 @@ public class DataInitializer implements CommandLineRunner {
                 polizaC1.setFechaInicio(LocalDate.of(2024, 1, 1));
                 polizaC1.setFechaFin(LocalDate.of(2024, 12, 31));
                 polizaC1.setCoberturas("Todo riesgo, Asistencia en carretera");
-                polizaC1.setUsuario(clienteC);
                 polizaC1.setAseguradora(atlantida);
                 polizaRepository.save(polizaC1);
                 
                 // Reclamos de Cliente C en julio, agosto, septiembre
                 Reclamo reclamoC1 = new Reclamo();
                 reclamoC1.setPoliza(polizaC1);
+                reclamoC1.setUsuario(clienteC);
                 reclamoC1.setFechaCreacion(LocalDateTime.of(2024, 7, 8, 13, 10));
                 reclamoC1.setFechaSiniestro(LocalDateTime.of(2024, 7, 7, 17, 45));
                 reclamoC1.setDescripcion("Volcadura en carretera Panamericana.");
@@ -512,6 +547,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoC2 = new Reclamo();
                 reclamoC2.setPoliza(polizaC1);
+                reclamoC2.setUsuario(clienteC);
                 reclamoC2.setFechaCreacion(LocalDateTime.of(2024, 8, 14, 10, 0));
                 reclamoC2.setFechaSiniestro(LocalDateTime.of(2024, 8, 13, 11, 30));
                 reclamoC2.setDescripcion("Hospitalización por accidente en San Salvador.");
@@ -521,6 +557,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 Reclamo reclamoC3 = new Reclamo();
                 reclamoC3.setPoliza(polizaC1);
+                reclamoC3.setUsuario(clienteC);
                 reclamoC3.setFechaCreacion(LocalDateTime.of(2024, 9, 25, 15, 30));
                 reclamoC3.setFechaSiniestro(LocalDateTime.of(2024, 9, 24, 18, 15));
                 reclamoC3.setDescripcion("Daño por granizo en zona de San Salvador.");
@@ -531,6 +568,7 @@ public class DataInitializer implements CommandLineRunner {
                 // Additional claims for Cliente C in October and December
                 Reclamo reclamoC4 = new Reclamo();
                 reclamoC4.setPoliza(polizaC1);
+                reclamoC4.setUsuario(clienteC);
                 reclamoC4.setFechaCreacion(LocalDateTime.of(2024, 10, 12, 10, 15));
                 reclamoC4.setFechaSiniestro(LocalDateTime.of(2024, 10, 11, 14, 30));
                 reclamoC4.setDescripcion("Choque en carretera a La Unión.");
@@ -540,6 +578,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 Reclamo reclamoC5 = new Reclamo();
                 reclamoC5.setPoliza(polizaC1);
+                reclamoC5.setUsuario(clienteC);
                 reclamoC5.setFechaCreacion(LocalDateTime.of(2024, 12, 8, 16, 45));
                 reclamoC5.setFechaSiniestro(LocalDateTime.of(2024, 12, 7, 9, 20));
                 reclamoC5.setDescripcion("Incendio parcial del vehículo en zona de San Salvador.");
@@ -548,6 +587,7 @@ public class DataInitializer implements CommandLineRunner {
                 reclamoRepository.save(reclamoC5);
             }
             log.info("Se crearon pólizas y reclamos para Cliente C.");
+            }
         }
     }
 }

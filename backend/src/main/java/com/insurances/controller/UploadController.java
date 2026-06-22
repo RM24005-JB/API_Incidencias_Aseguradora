@@ -80,7 +80,7 @@ public class UploadController {
         Reclamo reclamo = reclamoRepository.findById(reclamoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reclamo no encontrado"));
 
-        Long propietarioId = reclamo.getPoliza().getUsuario().getId();
+        Long propietarioId = reclamo.getUsuario().getId();
         if (!isAdmin && !propietarioId.equals(usuarioAutenticadoId)) {
             throw new ForbiddenException("No tiene permisos para subir documentos a este reclamo");
         }
@@ -136,7 +136,7 @@ public class UploadController {
                 .orElseThrow(() -> new ResourceNotFoundException("Documento no encontrado"));
 
         Reclamo reclamo = doc.getReclamo();
-        Long propietarioId = reclamo.getPoliza().getUsuario().getId();
+        Long propietarioId = reclamo.getUsuario().getId();
 
         if (!isAdmin && !propietarioId.equals(usuarioAutenticadoId)) {
             throw new ForbiddenException("No tiene permisos para descargar este documento");

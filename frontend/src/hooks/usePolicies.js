@@ -18,11 +18,8 @@ export const usePolicies = (page = 0, size = 6, filters = {}) => {
         return { content: [], totalPages: 0, totalElements: 0 };
       }
       
-      // Verificar si es admin para usar endpoint correcto
-      const userRole = localStorage.getItem('userRole');
-      const isAdmin = userRole === 'ADMIN';
-      
-      const endpoint = isAdmin ? '/admin/polizas' : '/polizas';
+      // Todos los usuarios (incluyendo clientes) ahora ven todas las pólizas del sistema
+      const endpoint = '/polizas';
       const params = new URLSearchParams({ page, size, ...cleanFilters });
       const res = await api.get(`${endpoint}?${params}`);
       return res.data;

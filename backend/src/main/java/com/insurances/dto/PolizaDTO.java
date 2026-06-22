@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Data
 public class PolizaDTO {
     private Long id;
-    private Long usuarioId;
     @NotNull
     private Long aseguradoraId;
     private String nombreAseguradora;

@@ -21,7 +21,9 @@ public class PolizaService {
     private final AseguradoraRepository aseguradoraRepository;
 
     public Page<PolizaDTO> listarPorUsuario(Long usuarioId, Pageable pageable) {
-        return polizaRepository.findByUsuarioId(usuarioId, pageable).map(this::toDTO);
+        // Ya no se listan pólizas por usuario
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return listarTodos(pageable);
     }
 
     public Page<PolizaDTO> listarTodos(Pageable pageable) {
@@ -33,14 +35,19 @@ public class PolizaService {
     }
 
     public Page<PolizaDTO> listarPorUsuarioYAseguradora(Long usuarioId, Long aseguradoraId, Pageable pageable) {
-        return polizaRepository.findByUsuarioIdAndAseguradoraId(usuarioId, aseguradoraId, pageable).map(this::toDTO);
+        // Ya no se listan pólizas por usuario y aseguradora
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return listarPorAseguradora(aseguradoraId, pageable);
     }
 
     public PolizaDTO crear(PolizaDTO dto, Long usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        // Ya no se necesita usuarioId para crear pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return crearComoAdmin(dto);
+    }
+
+    public PolizaDTO crearComoAdmin(PolizaDTO dto) {
         Poliza p = new Poliza();
-        p.setUsuario(usuario);
         p.setAseguradora(aseguradoraRepository.findById(dto.getAseguradoraId())
                 .orElseThrow(() -> new ResourceNotFoundException("Aseguradora no encontrada")));
         p.setNumeroPoliza(dto.getNumeroPoliza());
@@ -52,27 +59,14 @@ public class PolizaService {
     }
 
     public PolizaDTO actualizar(Long id, PolizaDTO dto, Long usuarioId) {
-        Poliza p = polizaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Póliza no encontrada"));
-        if (!p.getUsuario().getId().equals(usuarioId)) {
-            throw new AccessDeniedException("No puedes modificar una póliza que no te pertenece");
-        }
-        p.setAseguradora(aseguradoraRepository.findById(dto.getAseguradoraId())
-                .orElseThrow(() -> new ResourceNotFoundException("Aseguradora no encontrada")));
-        p.setNumeroPoliza(dto.getNumeroPoliza());
-        p.setTipo(dto.getTipo());
-        p.setFechaInicio(dto.getFechaInicio());
-        p.setFechaFin(dto.getFechaFin());
-        p.setCoberturas(dto.getCoberturas());
-        return toDTO(polizaRepository.save(p));
+        // Ya no se verifica usuarioId para actualizar pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
+        return actualizarComoAdmin(id, dto);
     }
 
     public void eliminar(Long id, Long usuarioId) {
-        Poliza p = polizaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Póliza no encontrada"));
-        if (!p.getUsuario().getId().equals(usuarioId)) {
-            throw new AccessDeniedException("No puedes eliminar una póliza que no te pertenece");
-        }
+        // Ya no se verifica usuarioId para eliminar pólizas
+        // Las pólizas son productos de aseguradoras, independientes de usuarios
         polizaRepository.deleteById(id);
     }
 
@@ -98,7 +92,6 @@ public class PolizaService {
     private PolizaDTO toDTO(Poliza p) {
         PolizaDTO dto = new PolizaDTO();
         dto.setId(p.getId());
-        dto.setUsuarioId(p.getUsuario().getId());
         dto.setAseguradoraId(p.getAseguradora().getId());
         dto.setNombreAseguradora(p.getAseguradora().getNombre());
         dto.setNumeroPoliza(p.getNumeroPoliza());

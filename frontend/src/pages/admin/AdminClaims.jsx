@@ -11,7 +11,7 @@ const AdminClaims = () => {
   const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState({ estado: '', aseguradoraId: '', fechaDesde: '', fechaHasta: '' });
-  const { claims, totalPages, isLoading, updateClaimStatus } = useAdminClaims(page, 10, filters);
+  const { claims, totalPages, isLoading, updateClaimStatus } = useAdminClaims(page, 20, filters);
   const { insurers } = useInsurers();
 
   const handleFilterChange = (e) => { setFilters({ ...filters, [e.target.name]: e.target.value }); setPage(0); };

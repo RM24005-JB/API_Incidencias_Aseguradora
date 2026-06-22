@@ -14,7 +14,7 @@ const Claims = () => {
   const { user } = useAuth();
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState({ estado: '', aseguradoraId: '', fechaDesde: '', fechaHasta: '' });
-  const { claims, totalPages, isLoading } = useClaims(page, 5, filters);
+  const { claims, totalPages, isLoading } = useClaims(page, 20, filters);
   const { insurers } = useInsurers();
   const isAdmin = user?.role === 'ADMIN';
 

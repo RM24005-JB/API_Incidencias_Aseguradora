@@ -25,9 +25,9 @@ export const useAuth = () => {
       }
     },
     retry: false,
-    refetchOnWindowFocus: true,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const loginMutation = useMutation({

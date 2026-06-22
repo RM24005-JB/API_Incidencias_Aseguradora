@@ -32,6 +32,15 @@ const AdminUsers = () => {
     onError: (err) => toast.error(err.response?.data?.message || t('error'))
   });
 
+  const deleteUser = useMutation({
+    mutationFn: (id) => api.delete(`/admin/usuarios/${id}`),
+    onSuccess: () => { 
+      toast.success(t('success')); 
+      queryClient.invalidateQueries(['admin-users']); 
+    },
+    onError: (err) => toast.error(err.response?.data?.message || t('error'))
+  });
+
   if (isLoading) return <LoadingSpinner />;
 
   return (
@@ -77,12 +86,20 @@ const AdminUsers = () => {
                   </span>
                 </td>
                 <td className="p-2">
-                  <button 
-                    onClick={() => toggleEnable.mutate(u.id)} 
-                    className="bg-yellow-600 text-white px-2 py-1 rounded hover:bg-yellow-700 transition"
-                  >
-                    {u.enabled ? t('deactivate') : t('activate')}
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => toggleEnable.mutate(u.id)} 
+                      className="bg-yellow-600 text-white px-2 py-1 rounded hover:bg-yellow-700 transition"
+                    >
+                      {u.enabled ? t('deactivate') : t('activate')}
+                    </button>
+                    <button 
+                      onClick={() => deleteUser.mutate(u.id)} 
+                      className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
+                    >
+                      {t('delete')}
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
